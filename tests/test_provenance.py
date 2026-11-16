@@ -20,7 +20,7 @@ def test_runtime_release_manifest_verifies_all_files() -> None:
 
     assert result["integrity_status"] == "VERIFIED"
     assert result["runtime_release"] == "1.2.2"
-    assert result["runtime_file_count"] == len(manifest["files"]) == 8
+    assert result["runtime_file_count"] == len(manifest["files"]) == 9
     assert len(result["release_manifest_sha256"]) == 64
 
 
