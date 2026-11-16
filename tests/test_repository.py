@@ -161,7 +161,7 @@ def test_local_env_generator_is_safe_and_base64_encodes_webhook_secret() -> None
 
 def test_local_kestra_image_is_version_pinned_without_source_mounts() -> None:
     docker_run = (ROOT / "docker-run.sh").read_text(encoding="utf-8")
-    assert "kestra/kestra:latest-slim server local" in docker_run
+    assert "kestra/kestra:v2.0.10-slim server local" in docker_run
     assert "kestra/kestra:latest-slim" not in docker_run
     assert "--env-file" in docker_run
     assert "/app/scripts" not in docker_run
