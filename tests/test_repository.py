@@ -22,7 +22,7 @@ def test_kestra_flow_has_expected_identity_and_separate_engines() -> None:
     flow = yaml.safe_load(flow_path.read_text(encoding="utf-8"))
 
     assert flow["id"] == "uwflow_production_underwriting"
-    assert flow["namespace"] == "com.ai.credit.production"
+    assert flow["namespace"] == "com.aigensys.credit.production"
 
     task_ids = {task["id"] for task in flow["tasks"]}
     assert "stage5_aidflow_inference" in task_ids
@@ -46,7 +46,7 @@ def test_every_python_task_uses_only_the_versioned_namespace_release() -> None:
         assert task["namespaceFiles"]["include"] == ["runtime/releases/1.2.2/**"]
         assert task["namespaceFiles"]["ifExists"] == "FAIL"
         assert task["taskRunner"]["type"] == "io.kestra.plugin.scripts.runner.docker.Docker"
-        assert task["containerImage"] == "python:3.11.18-slim-trixie"
+        assert task["containerImage"] == "aigensys/uwflow-runtime:1.2.2"
         assert "Path.cwd()" not in task["script"]
         assert "WORKING_DIR" in task["script"]
         assert "/app/scripts" not in task["script"]
@@ -105,7 +105,7 @@ def test_kestra_runtime_python_dependencies_are_exactly_pinned() -> None:
     script_tasks = list(_python_script_tasks(flow["tasks"]))
     for task in script_tasks:
         dependencies = task.get("dependencies", [])
-        assert "kestra==2.0.0" in dependencies
+        assert dependencies == []
         assert not any(item == "kestra" for item in dependencies)
     report_task = next(task for task in script_tasks if task["id"] == "stage7_render_report")
     assert "reportlab==4.4.9" in report_task["dependencies"]
@@ -123,7 +123,7 @@ def test_stage_one_records_the_pinned_python_task_image_in_provenance() -> None:
     assert stage_one["env"]["UWFLOW_TASK_IMAGE"] == image
     assert '"task_runner": "Docker"' in stage_one["script"]
     assert '"task_runner_type": "io.kestra.plugin.scripts.runner.docker.Docker"' in stage_one["script"]
-    assert '"python_task_image": os.environ["UWFLOW_TASK_IMAGE"]' in stage_one["script"]
+    assert '"python_task_image": ctx.env_str("UWFLOW_TASK_IMAGE")' in stage_one["script"]
     assert '"python_version": sys.version.split()[0]' in stage_one["script"]
 
 def test_flow_pins_the_exact_checked_in_runtime_manifest_digest() -> None:
@@ -150,7 +150,7 @@ def test_first_run_guide_uses_documented_oss_namespace_upload_contract() -> None
     guide = (ROOT / "docs" / "FIRST_RUN.md").read_text(encoding="utf-8")
     assert "kestractl namespaces create" not in guide
     assert "namespaces are implicit" in guide.lower()
-    assert "kestractl nsfiles upload com.ai.credit.production" in guide
+    assert "kestractl nsfiles upload com.aigensys.credit.production" in guide
     assert "runtime/releases/1.2.2" in guide
     assert "python tools/build_runtime_bundle.py --check" in guide
     upload_step = guide.split("## 6. Upload the approved Python release", 1)[1].split("## 7.", 1)[0]
@@ -158,7 +158,7 @@ def test_first_run_guide_uses_documented_oss_namespace_upload_contract() -> None
     assert "--fail-fast" in upload_command
     assert "--allow-missing-namespace" in upload_command
     assert "--override" not in upload_command
-    assert "kestractl nsfiles list com.ai.credit.production" in upload_step
+    assert "kestractl nsfiles list com.aigensys.credit.production" in upload_step
     assert "Why:" in guide
 
 
@@ -172,7 +172,7 @@ def test_local_env_generator_is_safe_and_base64_encodes_webhook_secret() -> None
 
 def test_local_kestra_image_is_version_pinned_without_source_mounts() -> None:
     docker_run = (ROOT / "docker-run.sh").read_text(encoding="utf-8")
-    assert "kestra/kestra:v2.0.10-slim server local" in docker_run
+    assert "kestra/kestra:latest-slim server local" in docker_run
     assert "kestra/kestra:latest-slim" not in docker_run
     assert "--env-file" in docker_run
     assert "/app/scripts" not in docker_run
