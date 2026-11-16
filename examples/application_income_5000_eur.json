@@ -1,0 +1,13 @@
+{
+  "applicant_id": "APP-2026-9482",
+  "applicant_name": "John Jones",
+  "applicant_age": 34,
+  "monthly_income": 5000.0,
+  "requested_amount": 8194.20,
+  "employment_status": "FULL_TIME",
+  "existing_monthly_debt_payments": 266.31,
+  "monthly_housing_cost": 491.65,
+  "loan_term_months": 60,
+  "data_sharing_consent": true,
+  "currency": "EUR"
+}

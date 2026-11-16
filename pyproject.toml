@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uwflow-kestra-underwriting-demo"
+version = "1.2.2"
+description = "Synthetic EUR consumer-loan underwriting workflow orchestrated with Kestra, with a dedicated AIDflow inference stage."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = [
+  "underwriting",
+  "credit-risk",
+  "kestra",
+  "workflow-orchestration",
+  "decision-engine",
+  "scoring",
+  "synthetic-data",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = []
+
+[project.optional-dependencies]
+reports = ["reportlab==4.4.9"]
+dev = [
+  "pytest>=8.0",
+  "PyYAML>=6.0",
+  "ruff>=0.11",
+  "reportlab==4.4.9",
+]
+
+[project.scripts]
+uwflow-demo = "demo_run:main"
+uwflow-report = "render_demo_report:main"
+
+[tool.setuptools]
+package-dir = {"" = "scripts"}
+py-modules = [
+  "aidflow_scoring",
+  "alternative_data",
+  "bureau_client",
+  "common",
+  "demo_run",
+  "hard_gates",
+  "render_demo_report",
+  "report_renderer",
+  "uwflow_engine",
+  "provenance",
+]
+include-package-data = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/demo_run.py" = ["E402"]
+"scripts/render_demo_report.py" = ["E402"]
+"tests/test_underwriting.py" = ["E402"]
+"tests/test_reports.py" = ["E402"]

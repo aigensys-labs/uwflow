@@ -1,0 +1,13 @@
+{
+  "applicant_id": "APP-DEMO-GATE-001",
+  "applicant_name": "John Jones",
+  "applicant_age": 17,
+  "monthly_income": 1966.61,
+  "requested_amount": 8194.2,
+  "employment_status": "FULL_TIME",
+  "existing_monthly_debt_payments": 266.31,
+  "monthly_housing_cost": 491.65,
+  "loan_term_months": 60,
+  "data_sharing_consent": true,
+  "currency": "EUR"
+}

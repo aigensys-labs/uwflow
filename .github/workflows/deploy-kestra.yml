@@ -1,0 +1,123 @@
+name: Deploy UWflow release to Kestra
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: uwflow-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy approved runtime, container image, and flow
+    runs-on: ubuntu-latest
+    environment: uwflow-production
+
+    steps:
+      - name: Check out tagged release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify this workflow is running from a release tag
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "Production deployment must run from a Git tag, not a branch." >&2
+            exit 1
+          fi
+          VERSION="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          EXPECTED_TAG="v${VERSION}"
+          if [[ "${GITHUB_REF_NAME}" != "${EXPECTED_TAG}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match project version ${EXPECTED_TAG}." >&2
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          # Lowercase repository owner for GHCR registry naming
+          echo "ghcr_owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')" >> "${GITHUB_OUTPUT}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push versioned runtime Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.release.outputs.ghcr_owner }}/uwflow-runtime:${{ steps.release.outputs.version }}
+            ghcr.io/${{ steps.release.outputs.ghcr_owner }}/uwflow-runtime:latest
+
+      - name: Install validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run release checks
+        run: |
+          python -m pytest -q
+          ruff check scripts tests tools
+          python tools/build_runtime_bundle.py --check
+
+      - name: Record deployment provenance
+        run: python tools/write_deployment_provenance.py
+
+      - name: Deploy immutable runtime bundle to Kestra Namespace Files
+        uses: kestra-io/deploy-namespace-files-action@46a87d14c9c81644cb232492ac25067228ecf473
+        with:
+          localPath: ./kestra/namespace-files/runtime/releases/${{ steps.release.outputs.version }}
+          namespacePath: runtime/releases/${{ steps.release.outputs.version }}
+          namespace: com.aigensys.credit.production
+          override: false
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Validate Kestra flow against the target instance
+        uses: kestra-io/validate-flows-action-v2@f95154ee2d16037585c18ab88fd9fb8668cee635
+        with:
+          directory: ./kestra/flows
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Deploy read-only UWflow production flow
+        uses: kestra-io/deploy-flows-action-v2@82d96bc143fe021017ed7219941da528c9ce3eb2
+        with:
+          directory: ./kestra/flows
+          override: true
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Upload deployment provenance record
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: uwflow-deployment-provenance-${{ steps.release.outputs.version }}
+          path: deployment-provenance.json
+          if-no-files-found: error

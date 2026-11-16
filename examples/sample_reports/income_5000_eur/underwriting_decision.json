@@ -1,0 +1,615 @@
+{
+  "engine": "UWflow Underwriting Engine",
+  "engine_version": "UWFLOW-UNDERWRITING-1.2-EUR",
+  "policy_version": "UW-DEMO-POLICY-1.1-EUR",
+  "decision_reference": "UWF-2DBA663011CB",
+  "application_id": "APP-2026-9482",
+  "applicant_display_name": "John Jones",
+  "decision_timestamp": "2026-11-15T22:25:17Z",
+  "run_mode": "SYNTHETIC_DEMO_ONLY",
+  "currency": "EUR",
+  "hard_gates": {
+    "stage": "HARD_GATES",
+    "status": "PASS",
+    "passed": true,
+    "applicant_id": "APP-2026-9482",
+    "policy_version": "UW-DEMO-POLICY-1.1-EUR",
+    "demo_mode": "SYNTHETIC_DEMO_ONLY",
+    "checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Required fields, numeric ranges and supported product parameters are valid"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Applicant age must be between 18 and 75 inclusive"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Verified gross monthly income must be at least EUR 655.54"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "status": "PASS",
+        "reason_code": null,
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months"
+      }
+    ],
+    "reason_codes": [],
+    "validation_errors": [],
+    "validated_profile": {
+      "age": 34,
+      "monthly_income": 5000.0,
+      "requested_amount": 8194.2,
+      "existing_monthly_debt_payments": 266.31,
+      "monthly_housing_cost": 491.65,
+      "loan_term_months": 60,
+      "employment_status": "FULL_TIME",
+      "data_sharing_consent": true,
+      "currency": "EUR"
+    }
+  },
+  "bureau_assessment": {
+    "stage": "CREDIT_BUREAU",
+    "status": "SUCCESS",
+    "decision_status": "PASS",
+    "passed": true,
+    "applicant_id": "APP-2026-9482",
+    "provider": "SYNTHETIC_BUREAU_ADAPTER",
+    "provider_reference": "BR-92613262",
+    "retrieved_at": "2026-11-15T22:25:17Z",
+    "bureau_score": 695,
+    "active_delinquencies": 0,
+    "public_records": 0,
+    "revolving_utilization": 0.625,
+    "recent_inquiries_6m": 5,
+    "oldest_account_months": 160,
+    "accounts_in_good_standing": 2,
+    "total_open_accounts": 7,
+    "reported_monthly_debt_payments": 256.01,
+    "reason_codes": [
+      "BUREAU_WITHIN_DEMO_POLICY"
+    ],
+    "policy_version": "UW-DEMO-POLICY-1.1-EUR",
+    "demo_mode": "SYNTHETIC_DEMO_ONLY",
+    "data_quality": {
+      "score_available": true,
+      "tradeline_count": 7,
+      "file_status": "THICK_FILE"
+    }
+  },
+  "aidflow_scoring": {
+    "engine": "AIDflow Scoring & Inference Engine",
+    "engine_version": "AIDFLOW-CUSTOMER-PROFILE-1.0",
+    "stage": "CUSTOMER_PROFILE_INFERENCE",
+    "inference_timestamp": "2026-11-15T22:25:17Z",
+    "run_mode": "SYNTHETIC_DEMO_ONLY",
+    "scoring_status": "SCORED",
+    "input_score_count": 10,
+    "expected_input_count": 10,
+    "input_coverage": 1.0,
+    "missing_source_ids": [],
+    "invalid_source_ids": [],
+    "duplicate_source_ids": [],
+    "input_scores": [
+      {
+        "source_id": "telco_stability",
+        "source_name": "Telecom payment history",
+        "input_score_0_100": 96.0,
+        "weight": 0.1,
+        "weighted_contribution": 9.6,
+        "source_role": "CREDIT_SIGNAL",
+        "status": "USED"
+      },
+      {
+        "source_id": "utility_reliability",
+        "source_name": "Utility payment history",
+        "input_score_0_100": 87.9,
+        "weight": 0.1,
+        "weighted_contribution": 8.79,
+        "source_role": "CREDIT_SIGNAL",
+        "status": "USED"
+      },
+      {
+        "source_id": "open_banking_cashflow",
+        "source_name": "Consented open-banking cash flow",
+        "input_score_0_100": 80.7,
+        "weight": 0.16,
+        "weighted_contribution": 12.912,
+        "source_role": "CREDIT_SIGNAL",
+        "status": "USED"
+      },
+      {
+        "source_id": "device_fingerprint",
+        "source_name": "Device integrity check",
+        "input_score_0_100": 96.0,
+        "weight": 0.08,
+        "weighted_contribution": 7.68,
+        "source_role": "FRAUD_CONTROL",
+        "status": "USED"
+      },
+      {
+        "source_id": "geo_mobility",
+        "source_name": "Session continuity check",
+        "input_score_0_100": 96.0,
+        "weight": 0.06,
+        "weighted_contribution": 5.76,
+        "source_role": "IDENTITY_CONTROL",
+        "status": "USED"
+      },
+      {
+        "source_id": "ecommerce_behavior",
+        "source_name": "Transaction integrity indicators",
+        "input_score_0_100": 96.0,
+        "weight": 0.08,
+        "weighted_contribution": 7.68,
+        "source_role": "FRAUD_CONTROL",
+        "status": "USED"
+      },
+      {
+        "source_id": "digital_identity_age",
+        "source_name": "Digital identity verification",
+        "input_score_0_100": 96.0,
+        "weight": 0.08,
+        "weighted_contribution": 7.68,
+        "source_role": "IDENTITY_CONTROL",
+        "status": "USED"
+      },
+      {
+        "source_id": "income_velocity",
+        "source_name": "Income consistency and regularity",
+        "input_score_0_100": 72.5,
+        "weight": 0.12,
+        "weighted_contribution": 8.7,
+        "source_role": "CREDIT_SIGNAL",
+        "status": "USED"
+      },
+      {
+        "source_id": "microloan_history",
+        "source_name": "Small-ticket repayment history",
+        "input_score_0_100": 98.7,
+        "weight": 0.12,
+        "weighted_contribution": 11.844,
+        "source_role": "CREDIT_SIGNAL",
+        "status": "USED"
+      },
+      {
+        "source_id": "merchant_affinity",
+        "source_name": "Merchant concentration context",
+        "input_score_0_100": 89.1,
+        "weight": 0.1,
+        "weighted_contribution": 8.91,
+        "source_role": "INFORMATIONAL_ONLY",
+        "status": "USED"
+      }
+    ],
+    "weight_configuration": {
+      "telco_stability": 0.1,
+      "utility_reliability": 0.1,
+      "open_banking_cashflow": 0.16,
+      "device_fingerprint": 0.08,
+      "geo_mobility": 0.06,
+      "ecommerce_behavior": 0.08,
+      "digital_identity_age": 0.08,
+      "income_velocity": 0.12,
+      "microloan_history": 0.12,
+      "merchant_affinity": 0.1
+    },
+    "score_scale": {
+      "minimum": 300,
+      "maximum": 900
+    },
+    "model_note": "Synthetic customer-profile inference over ten normalized source scores. Not an independently validated creditworthiness score.",
+    "complex_customer_profile_score": 837,
+    "weighted_profile_signal_0_100": 89.556,
+    "profile_band": "A_STRONG_PROFILE",
+    "reason_codes": [
+      "ALL_TEN_PROFILE_INPUTS_CONSUMED"
+    ]
+  },
+  "decision": "APPROVED",
+  "decision_status": "FINAL",
+  "reason_codes": [
+    "PROFILE_AND_AFFORDABILITY_WITHIN_UWFLOW_POLICY"
+  ],
+  "complex_customer_profile_score": 837,
+  "profile_band": "A_STRONG_PROFILE",
+  "risk_tier": "A_PRIME",
+  "source_results": [
+    {
+      "source_id": "telco_stability",
+      "source_name": "Telecom payment history",
+      "provider": "SYNTHETIC_TELCO_ADAPTER",
+      "source_role": "CREDIT_SIGNAL",
+      "profile_input_score": 96.0,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 0,
+      "latency_ms": 202,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "SYNTHETIC_CREDIT_SIGNAL_AVAILABLE"
+      ],
+      "signal_score": 96.0,
+      "metrics": {
+        "months_observed": 12,
+        "on_time_payments": 12,
+        "late_payments": 0
+      }
+    },
+    {
+      "source_id": "utility_reliability",
+      "source_name": "Utility payment history",
+      "provider": "SYNTHETIC_UTILITY_ADAPTER",
+      "source_role": "CREDIT_SIGNAL",
+      "profile_input_score": 87.9,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 1,
+      "latency_ms": 215,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "SYNTHETIC_CREDIT_SIGNAL_AVAILABLE"
+      ],
+      "signal_score": 87.9,
+      "metrics": {
+        "months_observed": 12,
+        "on_time_payments": 10,
+        "late_payments": 2
+      }
+    },
+    {
+      "source_id": "open_banking_cashflow",
+      "source_name": "Consented open-banking cash flow",
+      "provider": "SYNTHETIC_OPEN_BANKING_ADAPTER",
+      "source_role": "CREDIT_SIGNAL",
+      "profile_input_score": 80.7,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 1,
+      "latency_ms": 146,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "SYNTHETIC_CREDIT_SIGNAL_AVAILABLE"
+      ],
+      "signal_score": 80.7,
+      "metrics": {
+        "months_observed": 6,
+        "regular_income_inflows": 5,
+        "average_monthly_income_inflow": 5397.28,
+        "income_volatility_coefficient": 0.14,
+        "returned_debits_6m": 1
+      }
+    },
+    {
+      "source_id": "device_fingerprint",
+      "source_name": "Device integrity check",
+      "provider": "SYNTHETIC_DEVICE_INTELLIGENCE_ADAPTER",
+      "source_role": "FRAUD_CONTROL",
+      "profile_input_score": 96.0,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 3,
+      "latency_ms": 185,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "DEVICE_FINGERPRINT_CLEAR"
+      ],
+      "risk_level": "CLEAR",
+      "metrics": {
+        "device_reputation": "NEUTRAL",
+        "emulator_detected": false,
+        "ip_proxy_indicator": false
+      }
+    },
+    {
+      "source_id": "geo_mobility",
+      "source_name": "Session continuity check",
+      "provider": "SYNTHETIC_SESSION_CONTINUITY_ADAPTER",
+      "source_role": "IDENTITY_CONTROL",
+      "profile_input_score": 96.0,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 3,
+      "latency_ms": 372,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "GEO_MOBILITY_CLEAR"
+      ],
+      "risk_level": "CLEAR",
+      "metrics": {
+        "session_continuity": "CONSISTENT",
+        "impossible_travel_flag": false
+      }
+    },
+    {
+      "source_id": "ecommerce_behavior",
+      "source_name": "Transaction integrity indicators",
+      "provider": "SYNTHETIC_TRANSACTION_INTEGRITY_ADAPTER",
+      "source_role": "FRAUD_CONTROL",
+      "profile_input_score": 96.0,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 1,
+      "latency_ms": 187,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "ECOMMERCE_BEHAVIOR_CLEAR"
+      ],
+      "risk_level": "CLEAR",
+      "metrics": {
+        "payment_dispute_pattern": "NORMAL",
+        "account_takeover_indicator": false
+      }
+    },
+    {
+      "source_id": "digital_identity_age",
+      "source_name": "Digital identity verification",
+      "provider": "SYNTHETIC_IDENTITY_ADAPTER",
+      "source_role": "IDENTITY_CONTROL",
+      "profile_input_score": 96.0,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 2,
+      "latency_ms": 345,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "DIGITAL_IDENTITY_AGE_CLEAR"
+      ],
+      "risk_level": "CLEAR",
+      "metrics": {
+        "identity_status": "VERIFIED",
+        "document_verification": "PASSED",
+        "liveness_check": "PASSED"
+      }
+    },
+    {
+      "source_id": "income_velocity",
+      "source_name": "Income consistency and regularity",
+      "provider": "SYNTHETIC_INCOME_ANALYTICS_ADAPTER",
+      "source_role": "CREDIT_SIGNAL",
+      "profile_input_score": 72.5,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 3,
+      "latency_ms": 98,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "SYNTHETIC_CREDIT_SIGNAL_AVAILABLE"
+      ],
+      "signal_score": 72.5,
+      "metrics": {
+        "months_observed": 6,
+        "income_volatility_coefficient": 0.249,
+        "income_trend_6m_pct": 0.106
+      }
+    },
+    {
+      "source_id": "microloan_history",
+      "source_name": "Small-ticket repayment history",
+      "provider": "SYNTHETIC_MICROCREDIT_ADAPTER",
+      "source_role": "CREDIT_SIGNAL",
+      "profile_input_score": 98.7,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 0,
+      "latency_ms": 315,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "SYNTHETIC_CREDIT_SIGNAL_AVAILABLE"
+      ],
+      "signal_score": 98.7,
+      "metrics": {
+        "facilities_observed": 7,
+        "repaid_on_time": 7,
+        "currently_overdue": 0
+      }
+    },
+    {
+      "source_id": "merchant_affinity",
+      "source_name": "Merchant concentration context",
+      "provider": "SYNTHETIC_MERCHANT_CONTEXT_ADAPTER",
+      "source_role": "INFORMATIONAL_ONLY",
+      "profile_input_score": 89.1,
+      "profile_input_scale": "0-100_HIGHER_IS_STRONGER",
+      "status": "SUCCESS",
+      "coverage": "FULL",
+      "retrieved_at": "2026-11-15T22:25:17Z",
+      "freshness_days": 3,
+      "latency_ms": 274,
+      "applicant_id": "APP-2026-9482",
+      "demo_mode": "SYNTHETIC_DEMO_ONLY",
+      "reason_codes": [
+        "INFORMATIONAL_ONLY"
+      ],
+      "metrics": {
+        "merchant_concentration_index": 0.437,
+        "data_purpose": "INFORMATIONAL_ONLY_NOT_USED_IN_CREDIT_DECISION"
+      }
+    }
+  ],
+  "source_coverage": {
+    "successful_sources": 10,
+    "expected_profile_inputs": 10
+  },
+  "identity_review_flags": [],
+  "requested_amount": 8194.2,
+  "approved_amount": 8194.2,
+  "loan_term_months": 60,
+  "offered_apr_percent": 8.9,
+  "monthly_installment": 169.7,
+  "total_repayment": 10182.04,
+  "total_interest": 1987.84,
+  "affordability": {
+    "monthly_income_used": 5000.0,
+    "existing_monthly_debt_payments_used": 266.31,
+    "monthly_housing_cost": 491.65,
+    "proposed_monthly_installment": 169.7,
+    "post_offer_dti": 0.0872,
+    "post_offer_pti": 0.0339,
+    "residual_income_after_debt_housing_and_offer": 4072.34,
+    "maximum_dti": 0.45,
+    "maximum_pti": 0.3,
+    "minimum_residual_income": 1000.0,
+    "maximum_affordable_monthly_payment": 1500.0,
+    "maximum_affordable_principal": 40971.0,
+    "checks": [
+      {
+        "check_id": "MAX_DTI",
+        "status": "PASS",
+        "limit": 0.45,
+        "existing_monthly_debt": 266.31
+      },
+      {
+        "check_id": "MAX_PAYMENT_TO_INCOME",
+        "status": "PASS",
+        "limit": 0.3
+      },
+      {
+        "check_id": "MINIMUM_RESIDUAL_INCOME",
+        "status": "PASS",
+        "minimum_residual_income": 1000.0
+      },
+      {
+        "check_id": "MINIMUM_OFFER_AMOUNT",
+        "status": "PASS",
+        "minimum": 1229.13,
+        "calculated_cap": 40971.0
+      }
+    ]
+  },
+  "principal_decision_factors": [
+    "AIDflow complex customer profile score meets the automated underwriting threshold."
+  ],
+  "policy_checks": [
+    {
+      "check_id": "MINIMUM_AUTOMATED_PROFILE_SCORE",
+      "status": "PASS",
+      "score": 837,
+      "minimum": 620
+    },
+    {
+      "check_id": "BUREAU_POLICY",
+      "status": "PASS"
+    },
+    {
+      "check_id": "AIDFLOW_PROFILE_INPUT_COVERAGE",
+      "status": "PASS",
+      "received": 10,
+      "required": 10
+    },
+    {
+      "check_id": "MAX_DTI",
+      "status": "PASS",
+      "limit": 0.45,
+      "existing_monthly_debt": 266.31
+    },
+    {
+      "check_id": "MAX_PAYMENT_TO_INCOME",
+      "status": "PASS",
+      "limit": 0.3
+    },
+    {
+      "check_id": "MINIMUM_RESIDUAL_INCOME",
+      "status": "PASS",
+      "minimum_residual_income": 1000.0
+    },
+    {
+      "check_id": "MINIMUM_OFFER_AMOUNT",
+      "status": "PASS",
+      "minimum": 1229.13,
+      "calculated_cap": 40971.0
+    }
+  ],
+  "model_governance": {
+    "scoring_engine": "AIDflow",
+    "underwriting_engine": "UWflow",
+    "score_used_for_underwriting": true,
+    "score_definition": "One complex customer-profile score inferred from all ten normalized big-data source scores.",
+    "bureau_score_is_separate": true,
+    "synthetic_demo_only": true,
+    "production_caution": "Validate legal basis, consent, data minimization, feature suitability, proxy risk, fairness, calibration and explainability before any real lending use."
+  },
+  "audit_events": [
+    {
+      "event": "APPLICATION_RECEIVED",
+      "status": "COMPLETE",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "HARD_GATES_EVALUATED",
+      "status": "PASS",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "BUREAU_ASSESSED",
+      "status": "PASS",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "AIDFLOW_INFERENCE_COMPLETED",
+      "status": "837",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "AFFORDABILITY_ASSESSED",
+      "status": "PASS",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "PRICING_CALCULATED",
+      "status": "A_PRIME",
+      "timestamp": "2026-11-15T22:25:17Z"
+    },
+    {
+      "event": "FINAL_DECISION",
+      "status": "APPROVED",
+      "timestamp": "2026-11-15T22:25:17Z"
+    }
+  ]
+}

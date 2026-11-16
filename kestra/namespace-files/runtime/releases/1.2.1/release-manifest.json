@@ -1,0 +1,20 @@
+{
+  "aidflow_model_version": "AIDFLOW-CUSTOMER-PROFILE-1.0",
+  "artifact_type": "uwflow-kestra-runtime",
+  "files": {
+    "aidflow_scoring.py": "64de727c504e2d0f63965dc25ca5cb5ada5ce2f9c24e47779623b9e1ccd3d77c",
+    "alternative_data.py": "8a107802eecc0e56cad3b074b8c09690a3289b0c7e4dabb6ddee88888fa3a41f",
+    "bootstrap.py": "92afb828064ec93eb3387ff5979b903c784b8b014370325f46bc579d8b1e6381",
+    "bureau_client.py": "c7db65d552aeaf97bb3846971b19e4b564636a2b868ec71f04e148ee957bc6e0",
+    "common.py": "d6697d82e70d94e9763b650760f8180d04e2bf9275be2c1e62129790c0c20a4e",
+    "hard_gates.py": "6b26ad73bb9f7f3859c30610eb24e48048a8afa51c8c28de86fb4b336c73f11b",
+    "provenance.py": "b8ff982462b4152918ed35948c6da415fbbebb5170616080ffee1bc9abea9b63",
+    "report_renderer.py": "1539b65db5fff25403e38c085d8de217a4f47f87f31320a62d26ffd9a3ab0c36",
+    "uwflow_engine.py": "87f0824f145329e767110e6b5e663a6adf954dd9023df2544ef5923dea8a5054"
+  },
+  "manifest_format": 1,
+  "policy_version": "UW-DEMO-POLICY-1.1-EUR",
+  "release_version": "1.2.1",
+  "source_ref": "v1.2.1",
+  "uwflow_engine_version": "UWFLOW-UNDERWRITING-1.2-EUR"
+}
