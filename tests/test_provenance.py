@@ -9,7 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from provenance import load_runtime_provenance
+from provenance import load_runtime_provenance # noqa: E402
 
 RELEASE_ROOT = ROOT / "kestra" / "namespace-files" / "runtime" / "releases" / "1.2.2"
 
