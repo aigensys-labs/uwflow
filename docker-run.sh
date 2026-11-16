@@ -31,4 +31,4 @@ docker run --pull=always --rm -it -p 8080:8080 --user=root \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /tmp:/tmp \
   --env-file "${PROJECT_DIR}/.env" \
-  kestra/kestra:latest-slim server local
+  kestra/kestra:v2.0.10-slim server local

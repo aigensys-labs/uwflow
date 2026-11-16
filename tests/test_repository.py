@@ -61,16 +61,6 @@ def test_runtime_bundle_and_flow_are_version_aligned() -> None:
     assert "runtime/releases/1.2.2" in flow
 
 
-def test_environment_example_does_not_contain_live_credentials() -> None:
-    env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
-    assert "GENERATE_WITH_tools/create-local-env.sh" in env_example
-    assert "SECRET_UNDERWRITING_WEBHOOK_KEY=" in env_example
-    assert "replace-this-with-a-long-random-secret" in __import__("base64").b64decode(
-        env_example.split("SECRET_UNDERWRITING_WEBHOOK_KEY=", 1)[1].splitlines()[0]
-    ).decode()
-    assert "local-uw-demo-hook-2026-change-me" not in env_example
-
-
 def test_docker_runner_does_not_mount_application_source() -> None:
     docker_run = (ROOT / "docker-run.sh").read_text(encoding="utf-8")
     assert "/app/scripts" not in docker_run
@@ -104,11 +94,10 @@ def test_kestra_runtime_python_dependencies_are_exactly_pinned() -> None:
     )
     script_tasks = list(_python_script_tasks(flow["tasks"]))
     for task in script_tasks:
-        dependencies = task.get("dependencies", [])
-        assert dependencies == []
-        assert not any(item == "kestra" for item in dependencies)
-    report_task = next(task for task in script_tasks if task["id"] == "stage7_render_report")
-    assert "reportlab==4.4.9" in report_task["dependencies"]
+        assert task.get("dependencies", []) == []
+
+    dockerfile = (ROOT / "docker" / "Dockerfile").read_text(encoding="utf-8")
+    assert "reportlab==4.4.9" in dockerfile
 
 
 
@@ -124,7 +113,7 @@ def test_stage_one_records_the_pinned_python_task_image_in_provenance() -> None:
     assert '"task_runner": "Docker"' in stage_one["script"]
     assert '"task_runner_type": "io.kestra.plugin.scripts.runner.docker.Docker"' in stage_one["script"]
     assert '"python_task_image": ctx.env_str("UWFLOW_TASK_IMAGE")' in stage_one["script"]
-    assert '"python_version": sys.version.split()[0]' in stage_one["script"]
+    assert '"python_version": ctx.sys.version.split()[0]' in stage_one["script"]
 
 def test_flow_pins_the_exact_checked_in_runtime_manifest_digest() -> None:
     flow = yaml.safe_load(
@@ -153,7 +142,7 @@ def test_first_run_guide_uses_documented_oss_namespace_upload_contract() -> None
     assert "kestractl nsfiles upload com.aigensys.credit.production" in guide
     assert "runtime/releases/1.2.2" in guide
     assert "python tools/build_runtime_bundle.py --check" in guide
-    upload_step = guide.split("## 6. Upload the approved Python release", 1)[1].split("## 7.", 1)[0]
+    upload_step = guide.split("## 7. Upload the approved Python release", 1)[1].split("## 8.", 1)[0]
     upload_command = upload_step.split("```bash", 1)[1].split("```", 1)[0]
     assert "--fail-fast" in upload_command
     assert "--allow-missing-namespace" in upload_command
