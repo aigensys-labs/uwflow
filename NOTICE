@@ -1,0 +1,9 @@
+UWflow - Governed Underwriting Orchestration with AIDflow Inference
+Copyright 2026 AIGENSYS s.r.o.
+
+This product includes software developed by AIGENSYS s.r.o.
+Architecture designed from production fintech risk and underwriting practice.
+
+UWflow is a synthetic demonstration. All bureau and alternative-data responses
+are deterministic simulations. The included weights, thresholds, and prices are
+illustrative. Do not use this project to make real credit decisions.
