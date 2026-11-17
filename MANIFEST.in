@@ -1,9 +1,10 @@
 include README.md LICENSE CHANGELOG.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md SUPPORT.md
-include pyproject.toml requirements.txt .env.example .editorconfig .gitattributes .gitignore docker-run.sh
+include pyproject.toml requirements.txt .editorconfig .gitattributes .gitignore docker-run.sh
 recursive-include scripts *.py
 recursive-include tests *.py
 recursive-include tools *.py
 recursive-include examples *.json *.md *.html *.pdf
 recursive-include kestra *.yaml *.json *.py
+recursive-include docker *.*
 recursive-include docs *.md
 recursive-include .github *.yml *.md

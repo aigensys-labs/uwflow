@@ -32,11 +32,10 @@ consider inappropriate, threatening, offensive, or harmful.
 
 ## Reporting
 
-For conduct concerns, contact the repository maintainers through the private
-contact or reporting channel configured in the GitHub repository. Do not use a
-public issue for sensitive reports. Maintainers will review reports promptly
-and fairly and will respect confidentiality to the extent reasonably
-possible.
+For conduct concerns, contact: **conduct@aigensys.com** (or open a private
+issue via the repository's "Report" button). Do not use a public issue for
+sensitive reports. Reports are reviewed within 48 hours and handled with
+confidentiality to the extent reasonably possible.
 
 ## Scope
 
