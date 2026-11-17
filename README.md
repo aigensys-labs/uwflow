@@ -286,3 +286,15 @@ MIT. See [LICENSE](LICENSE).
 ## Before real underwriting
 
 This repository is a synthetic demonstration. Read [Production readiness](docs/PRODUCTION_READINESS.md) before connecting real applicants, credit bureaus or lending decisions.
+
+## Citation
+
+```bibtex
+@software{UWflow,
+  author = {Michal Ricar, PhD},
+  year = {2026},
+  publisher = {AIGENSYS s.r.o.},
+  title = {UWflow: Governed Underwriting Orchestration with AIDflow Inference},
+  url = {https://github.com/aigensys-labs/uwflow}
+}
+```
