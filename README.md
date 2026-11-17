@@ -17,8 +17,8 @@
 
 <div align="center">
 
-*Synthetic demonstration. All bureau and alternative-data responses are deterministic simulations.*<br />
-*Not for use in real credit decisions.*
+*Synthetic demonstration. Not for use in real credit decisions.<br>All bureau and alternative-data responses are deterministic simulations.*<br />
+
 
 [<img src="https://raw.githubusercontent.com/aigensys-labs/uwflow/main/docs/assets/uwflow-preview.gif" alt="UWflow" width="500">](https://github.com/aigensys-labs/uwflow/blob/main/docs/assets/uwflow-preview.gif)
 
