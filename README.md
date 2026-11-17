@@ -36,17 +36,19 @@ Kestra orchestrates the underwriting stages and stores approved runtime code as 
 
 ## Architecture
 
+Full system view. The left portion (GitHub → CI/CD → Kestra) is the
+production deployment pipeline. The right portion (stages 1–7) is the
+underwriting decision flow.
+
 ```mermaid
 flowchart TD
     GH[GitHub repository
     protected branches · PR review · tests · signed tags] --> CI[CI / CD
     verify release bundle · validate flow]
-    CI -->|upload versioned bundle| NF[Kestra Namespace Files
-    runtime/releases/1.2.2]
-    CI -->|deploy read-only flow| KF[Kestra production flow]
-    KF --> G[Hard gates + bureau] --> AD[10 parallel UWflow source adapters]
-    AD --> AI[AIDflow inference
-    10 scores → 1 customer profile score]
+    CI -->|upload versioned bundle| NF[Kestra Namespace Files<br/>runtime/releases/1.2.2]
+    CI -->|deploy read-only flow| KF[Kestra <br/>production flow]
+    KF --> G[Hard gates <br/>+ bureau] --> AD[10 parallel <br/>Data sources]
+    AD --> AI[AIDflow inference<br/>10 scores → 1]
     AI --> UW[UWflow decision engine
     eligibility · affordability · pricing · outcome]
     UW --> RP[UWflow reports
