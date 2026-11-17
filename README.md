@@ -281,7 +281,7 @@ All sample inputs and reports use synthetic data and EUR. The reference applican
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). UWflow trademarks/branding and separately owned IP are not granted by the license.
 
 ## Before real underwriting
 
