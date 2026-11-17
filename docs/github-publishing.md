@@ -5,7 +5,7 @@ This project is delivered as a complete repository template. The archive is not 
 ## 1. Before the first push
 
 1. Replace the `[COPYRIGHT HOLDER]` placeholder in `LICENSE` with the actual individual or legal entity that owns the rights to this code. Do not guess or leave the placeholder in a public release.
-2. Review `README.md`, the synthetic-data disclaimer, and the MIT licensing decision with the intended repository owner.
+2. Review `README.md`, the synthetic-data disclaimer, and the Apache 2.0 licensing decision with the intended repository owner.
 3. Choose the repository visibility and create an empty GitHub repository. Do not initialize it with an additional README, license, or `.gitignore`, because those files are already present.
 4. Extract the archive and initialize/push the repository:
 

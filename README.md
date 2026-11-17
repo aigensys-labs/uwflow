@@ -10,7 +10,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 [![Kestra](https://img.shields.io/badge/kestra-2.x-purple)](https://kestra.io/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-Apache--2.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Code Style](https://img.shields.io/badge/code%20style-ruff-FA5A2E)](https://github.com/astral-sh/ruff)
 
 </div>

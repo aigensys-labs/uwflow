@@ -59,4 +59,4 @@ payloads to issues or pull requests.
 6. Do not include personal data, secrets or generated local artifacts.
 
 By submitting a contribution, you agree that it may be redistributed under
-the repository's [MIT License](LICENSE).
+the repository's [Apache 2.0 License](LICENSE).
