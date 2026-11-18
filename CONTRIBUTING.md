@@ -9,10 +9,9 @@ must not introduce real applicant information, credentials or production data.
 Python 3.11 or newer is required.
 
 ```bash
-python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+git clone https://github.com/aigensys-labs/uwflow.git
+cd uwflow
+python3 -m venv .venv && source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```

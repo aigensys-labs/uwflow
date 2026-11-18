@@ -130,10 +130,7 @@ Kestra Open Source namespaces are implicit; no namespace-creation command is req
 If you want to run unit tests or CLI tools directly on your machine:
 
 ```bash
-python3 -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows PowerShell: .venv\Scripts\Activate.ps1
+python3 -m venv .venv && source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 

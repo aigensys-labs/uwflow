@@ -33,12 +33,12 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-reports = ["reportlab==4.4.9"]
+reports = ["reportlab==5.1.0"]
 dev = [
   "pytest>=8.0",
   "PyYAML>=6.0",
   "ruff>=0.11",
-  "reportlab==4.4.9",
+  "reportlab==5.1.0",
 ]
 
 [project.scripts]

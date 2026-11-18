@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
 import hashlib
 
@@ -86,6 +87,23 @@ def test_local_slim_kestra_launcher_uses_server_local_plugin_install_without_sou
     assert "--env-file" in docker_run
 
 
+def _collect_exact_pins(pyproject: dict) -> dict[str, str]:
+    """Extract all ==-pinned deps from dependencies + optional-dependencies."""
+    pinned: dict[str, str] = {}
+
+    def scan(deps: list[str]) -> None:
+        for dep in deps:
+            if "==" in dep:
+                name, version = dep.split("==", 1)
+                pinned[name.strip()] = version.strip()
+
+    scan(pyproject.get("project", {}).get("dependencies", []))
+    for extras in pyproject.get("project", {}).get("optional-dependencies", {}).values():
+        scan(extras)
+
+    return pinned
+
+
 def test_kestra_runtime_python_dependencies_are_exactly_pinned() -> None:
     flow = yaml.safe_load(
         (ROOT / "kestra" / "flows" / "uwflow_production_underwriting.yaml").read_text(
@@ -96,8 +114,19 @@ def test_kestra_runtime_python_dependencies_are_exactly_pinned() -> None:
     for task in script_tasks:
         assert task.get("dependencies", []) == []
 
+    pyproject = tomllib.loads(
+        (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    )
+    pinned = _collect_exact_pins(pyproject)
+
+    assert pinned, "No exact pins found in pyproject.toml — is that intentional?"
+
     dockerfile = (ROOT / "docker" / "Dockerfile").read_text(encoding="utf-8")
-    assert "reportlab==4.4.9" in dockerfile
+    for name, version in pinned.items():
+        expected = f"{name}=={version}"
+        assert expected in dockerfile, (
+            f"Dockerfile missing '{expected}' — pyproject.toml is the source of truth"
+        )
 
 
 

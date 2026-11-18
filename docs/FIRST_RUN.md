@@ -15,6 +15,7 @@ You need Docker running, Python 3.11 or newer, this repository extracted, and a 
 ## 1. Create a local login
 
 ```bash
+chmod +x ./tools/create-local-env.sh
 ./tools/create-local-env.sh
 ```
 
@@ -32,6 +33,7 @@ rm .env
 
 
 ```bash
+chmod +x ./tools/build-docker.sh
 ./tools/build-docker.sh
 ```
 
@@ -41,6 +43,7 @@ rm .env
 ## 3. Start Kestra
 
 ```bash
+chmod +x ./docker-run.sh
 ./docker-run.sh
 ```
 
@@ -88,6 +91,7 @@ If you kept an already-running server, replace the two values above with the use
 ## 6. Check the release before uploading
 
 ```bash
+source .venv/bin/activate
 python tools/build_runtime_bundle.py --check
 ```
 
