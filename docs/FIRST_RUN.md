@@ -12,6 +12,18 @@ You need Docker running, Python 3.11 or newer, this repository extracted, and a 
 
 **Already have Kestra running from an older UWflow setup?** Stop it before Step 2 and start it again with this repository's launcher. This version adds a webhook secret; a running container cannot receive a new environment value. The Docker volumes keep your existing Kestra data. If your current server was already started with this repository's `.env`, you can leave it running and skip Step 2.
 
+## 0. Clone the UWflow repo
+
+```bash
+git clone https://github.com/aigensys-labs/uwflow.git
+cd uwflow
+python3 -m venv .venv && source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+**Why:** your local machine needs the package importable so that tests, linters, and the `uwflow-demo` / `uwflow-report` entry points work from the terminal. The venv isolates dependencies from your system Python; the `-e` flag makes source edits take effect immediately without re-installing; `.[dev]` pulls in `reportlab`, `pytest`, `PyYAML`, and `ruff`. 
+
 ## 1. Create a local login
 
 ```bash
