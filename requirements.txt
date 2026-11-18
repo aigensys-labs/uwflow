@@ -1,2 +1,2 @@
 # Exact PDF renderer version used by the sample HTML/PDF output.
-reportlab==4.4.9
+reportlab==5.1.0
