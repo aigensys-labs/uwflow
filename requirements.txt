@@ -1,0 +1,2 @@
+# Core Python runner and Stage 7 PDF reports.
+reportlab==5.1.0

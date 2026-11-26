@@ -1,0 +1,72 @@
+name: uwflow-studio
+
+services:
+  studio-api:
+    build:
+      context: ../..
+      dockerfile: modules/policy-studio/docker/studio/api.Dockerfile
+    image: ai/uwflow-studio-api:dev
+    init: true
+    user: "${UWFLOW_DOCKER_UID:-1000}:${UWFLOW_DOCKER_GID:-1000}"
+    working_dir: /workspace
+    environment:
+      HOME: /tmp
+      PYTHONPATH: /workspace/modules/policy-studio:/workspace:/workspace/core/python/runtime
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      UWFLOW_CURRENT_PROD_RELEASE: "${UWFLOW_CURRENT_PROD_RELEASE:-}"
+    volumes:
+      - type: bind
+        source: ../..
+        target: /workspace
+    ports:
+      - "127.0.0.1:${UWFLOW_STUDIO_API_PORT:-9000}:9000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/api/health', timeout=2)"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  studio-frontend:
+    build:
+      context: ../..
+      dockerfile: modules/policy-studio/docker/studio/frontend.Dockerfile
+    image: ai/uwflow-studio-frontend:dev
+    init: true
+    depends_on:
+      studio-api:
+        condition: service_healthy
+    working_dir: /workspace
+    environment:
+      VITE_STUDIO_API_URL: http://studio-api:9000
+      UWFLOW_VITE_CACHE_DIR: /workspace/node_modules/.vite
+    volumes:
+      - type: bind
+        source: ../../modules/policy-studio/frontend
+        target: /workspace/frontend
+        read_only: true
+      - type: volume
+        source: uwflow_studio_node_modules
+        target: /workspace/node_modules
+    ports:
+      - "127.0.0.1:${UWFLOW_STUDIO_WEB_PORT:-5173}:5173"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5173/').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+volumes:
+  uwflow_studio_node_modules:
+    external: true
+    name: uwflow_studio_node_modules

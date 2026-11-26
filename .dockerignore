@@ -1,0 +1,43 @@
+.git
+.github
+venv
+env
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+modules/policy-studio/frontend/node_modules
+modules/policy-studio/frontend/dist
+modules/policy-studio/frontend/.vite
+build
+dist
+*.egg-info
+.eggs
+*.egg
+*.whl
+.tox
+.nox
+
+# Never send local secrets or environment files to the image builder.
+.env
+.env.*
+!.env.example
+modules/policy-studio/frontend/.env.local
+modules/policy-studio/frontend/.env.local.*
+!modules/policy-studio/frontend/.env.local.example
+*.pem
+*.key
+
+# All repository-local operational state is bind-mounted or managed outside images.
+var/
+uwflow_history_pgdata/
+*.sqlite
+*.sqlite3
+*.db
+*.parquet
+
+# Immutable Core Namespace Files are published separately to Kestra.
+/core/kestra/namespace-files/

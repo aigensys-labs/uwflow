@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "id": "stage1_hard_gates_v1",
+  "stage": "stage_1_hard_gates",
+  "kind": "dmn_table",
+  "description": "One positive eligibility predicate per underwriting variable. PASS is derived when the predicate is true; FAIL and its reason code are derived when it is false. Input parsing and application validation remain in hard_gates.py.",
+  "inputs": [
+    {
+      "field": "validation_error_count",
+      "type": "integer"
+    },
+    {
+      "field": "applicant_age",
+      "type": "integer"
+    },
+    {
+      "field": "monthly_income",
+      "type": "number"
+    },
+    {
+      "field": "employment_status",
+      "type": "string"
+    },
+    {
+      "field": "requested_amount",
+      "type": "number"
+    },
+    {
+      "field": "loan_term_months",
+      "type": "integer"
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "APPLICATION_DATA_VALID",
+      "field": "validation_error_count",
+      "description": "Required fields, numeric ranges and supported product parameters are valid",
+      "valid_when": {
+        "op": "==",
+        "value": 0
+      },
+      "failure_reason_code": "INVALID_APPLICATION_DATA"
+    },
+    {
+      "check_id": "MINIMUM_AGE",
+      "field": "applicant_age",
+      "description": "Applicant age must be between 18 and 75 inclusive",
+      "valid_when": {
+        "op": "between",
+        "value": [
+          18,
+          75
+        ]
+      },
+      "failure_reason_code": "AGE_OUT_OF_POLICY"
+    },
+    {
+      "check_id": "MINIMUM_INCOME",
+      "field": "monthly_income",
+      "description": "Verified gross monthly income must be at least EUR 655.54",
+      "valid_when": {
+        "op": ">=",
+        "value": 655.54
+      },
+      "failure_reason_code": "INCOME_BELOW_POLICY_FLOOR"
+    },
+    {
+      "check_id": "EMPLOYMENT_STATUS",
+      "field": "employment_status",
+      "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+      "valid_when": {
+        "op": "in",
+        "value": [
+          "FULL_TIME",
+          "PART_TIME",
+          "SELF_EMPLOYED",
+          "FIXED_TERM"
+        ]
+      },
+      "failure_reason_code": "UNEMPLOYED_STATUS"
+    },
+    {
+      "check_id": "REQUEST_AMOUNT",
+      "field": "requested_amount",
+      "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+      "valid_when": {
+        "op": "between",
+        "value": [
+          1229.13,
+          40971.0
+        ]
+      },
+      "failure_reason_code": "REQUEST_AMOUNT_OUT_OF_RANGE"
+    },
+    {
+      "check_id": "LOAN_TERM",
+      "field": "loan_term_months",
+      "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+      "valid_when": {
+        "op": "in",
+        "value": [
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84
+        ]
+      },
+      "failure_reason_code": "UNSUPPORTED_LOAN_TERM"
+    }
+  ]
+}

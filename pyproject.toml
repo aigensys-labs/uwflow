@@ -1,0 +1,140 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uwflow"
+version = "2.0.0"
+description = "Modular underwriting workflow platform built on a reusable Kestra and Python execution core."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "AIGENSYS", email = "info@aigensys.com" },
+    { name = "Michal Ricar", email = "michal.ricar@aigensys.com" }
+]
+keywords = [
+  "underwriting",
+  "credit-risk",
+  "kestra",
+  "workflow-orchestration",
+  "decision-engine",
+  "scoring",
+  "synthetic-data",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = ["reportlab==5.1.0"]
+
+[project.optional-dependencies]
+studio = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "httpx2>=2.0,<3"]
+history-postgres = ["SQLAlchemy>=2.0,<3", "psycopg[binary]>=3.2,<4"]
+history-parquet = ["pyarrow>=18,<30"]
+history = ["SQLAlchemy>=2.0,<3", "psycopg[binary]>=3.2,<4", "pyarrow>=18,<30"]
+dev = [
+  "fastapi>=0.115,<1",
+  "httpx2>=2.0,<3",
+  "pytest>=8.0",
+  "PyYAML>=6.0",
+  "SQLAlchemy>=2.0,<3",
+  "ruff==0.17.6",
+]
+
+[project.scripts]
+uwflow = "core.python.cli:main"
+uwflow-demo = "core.python.cli:main"
+uwflow-report = "core.python.cli:main"
+
+[tool.setuptools]
+packages = [
+  "core",
+  "core.python",
+  "core.underwriting",
+  "core.underwriting.tools",
+  "studio",
+  "tools",
+  "tools.demo",
+  "tools.policy",
+  "tools.history",
+  "tools.history.datasets",
+  "tools.history.database",
+  "tools.history.replay",
+  "tools.kestra",
+  "uwflow_history",
+  "uwflow_history.connectors",
+  "uwflow_history.generation",
+  "uwflow_history.replay",
+  "modules",
+  "modules.history",
+  "modules.history.tools",
+  "modules.evaluation",
+  "modules.evaluation.tools",
+  "modules.production",
+  "modules.production.tools",
+  "modules.production.tools.release",
+  "modules.lifecycle",
+  "modules.lifecycle.tools",
+  "modules.reporting",
+  "modules.reporting.tools",
+]
+py-modules = [
+  "aidflow_scoring",
+  "alternative_data",
+  "bureau_client",
+  "common",
+  "hard_gates",
+  "report_renderer",
+  "uwflow_engine",
+  "provenance",
+  "policy_generated",
+]
+include-package-data = false
+
+[tool.setuptools.package-dir]
+"" = "core/python/runtime"
+"core" = "core"
+"core.python" = "core/python"
+"core.underwriting" = "core/underwriting"
+"core.underwriting.tools" = "core/underwriting/tools"
+"studio" = "modules/policy-studio/studio"
+"tools" = "tools"
+"uwflow_history" = "modules/history/python/uwflow_history"
+"modules" = "modules"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["modules/policy-studio", "."]
+python_files = ["test_*.py"]
+addopts = "-ra -p no:cacheprovider"
+
+[tool.ruff]
+cache-dir = "var/cache/ruff"
+target-version = "py312"
+line-length = 100
+src = ["core/python/runtime", "modules/policy-studio", "modules/history/python", "modules", "tests", "tools"]
+exclude = [
+    "core/kestra/namespace-files/runtime/",
+    "core/python/runtime/",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501", "E402", "F841"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint.per-file-ignores]
+"tools/demo/run.py" = ["E402"]
+"tools/demo/render_report.py" = ["E402"]
+"tests/**" = ["E402"]

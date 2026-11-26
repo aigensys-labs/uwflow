@@ -1,0 +1,622 @@
+[
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "default"
+  },
+  {
+    "application": {
+      "applicant_age": 17,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 17,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": "AGE_OUT_OF_POLICY",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "age_below"
+  },
+  {
+    "application": {
+      "applicant_age": 76,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 76,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": "AGE_OUT_OF_POLICY",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "age_above"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 500.0,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 500.0,
+      "requested_amount": 8194.2,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": "INCOME_BELOW_POLICY_FLOOR",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "income_below"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "UNEMPLOYED",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "UNEMPLOYED",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": "UNEMPLOYED_STATUS",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "unemployed"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 500.0
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 500.0,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": "REQUEST_AMOUNT_OUT_OF_RANGE",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "amount_below"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 50000.0
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 50000.0,
+      "validation_error_count": 0
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": "REQUEST_AMOUNT_OUT_OF_RANGE",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "amount_above"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 18,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 18,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 1
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": "INVALID_APPLICATION_DATA",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": "UNSUPPORTED_LOAN_TERM",
+        "status": "FAIL"
+      }
+    ],
+    "scenario": "term_unsupported"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "CZK",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 34,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 60,
+      "monthly_income": 1966.61,
+      "requested_amount": 8194.2,
+      "validation_error_count": 1
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": "INVALID_APPLICATION_DATA",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": null,
+        "status": "PASS"
+      }
+    ],
+    "scenario": "currency_invalid"
+  },
+  {
+    "application": {
+      "applicant_age": 34,
+      "applicant_id": "APP-2026-9482",
+      "applicant_name": "John Jones",
+      "currency": "EUR",
+      "data_sharing_consent": true,
+      "employment_status": "FULL_TIME",
+      "existing_monthly_debt_payments": 266.31,
+      "loan_term_months": 60,
+      "monthly_housing_cost": 491.65,
+      "monthly_income": "not-a-number",
+      "requested_amount": 8194.2
+    },
+    "context": {
+      "applicant_age": 0,
+      "employment_status": "FULL_TIME",
+      "loan_term_months": 0,
+      "monthly_income": 0.0,
+      "requested_amount": 0.0,
+      "validation_error_count": 1
+    },
+    "expected_checks": [
+      {
+        "check_id": "APPLICATION_DATA_VALID",
+        "description": "Required fields, numeric ranges and supported product parameters are valid",
+        "reason_code": "INVALID_APPLICATION_DATA",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_AGE",
+        "description": "Applicant age must be between 18 and 75 inclusive",
+        "reason_code": "AGE_OUT_OF_POLICY",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "MINIMUM_INCOME",
+        "description": "Verified gross monthly income must be at least EUR 655.54",
+        "reason_code": "INCOME_BELOW_POLICY_FLOOR",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "EMPLOYMENT_STATUS",
+        "description": "Unemployed applicants do not meet this demo product's eligibility policy",
+        "reason_code": null,
+        "status": "PASS"
+      },
+      {
+        "check_id": "REQUEST_AMOUNT",
+        "description": "Requested principal must be between EUR 1,229.13 and EUR 40,971.00",
+        "reason_code": "REQUEST_AMOUNT_OUT_OF_RANGE",
+        "status": "FAIL"
+      },
+      {
+        "check_id": "LOAN_TERM",
+        "description": "Requested term must be one of 12, 24, 36, 48, 60, 72 or 84 months",
+        "reason_code": "UNSUPPORTED_LOAN_TERM",
+        "status": "FAIL"
+      }
+    ],
+    "scenario": "income_malformed"
+  }
+]

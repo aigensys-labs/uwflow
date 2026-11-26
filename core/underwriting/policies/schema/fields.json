@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "description": "Allow-listed, stage-scoped policy context fields. This catalogue is deliberately narrower than the full application payload.",
+  "fields": {
+    "validation_error_count": {
+      "type": "integer",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Count of existing application-data validation errors."
+    },
+    "applicant_age": {
+      "type": "integer",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Validated applicant age in whole years."
+    },
+    "monthly_income": {
+      "type": "number",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Validated gross monthly income in EUR."
+    },
+    "employment_status": {
+      "type": "string",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Normalized employment status."
+    },
+    "requested_amount": {
+      "type": "number",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Validated requested principal in EUR."
+    },
+    "loan_term_months": {
+      "type": "integer",
+      "stages": ["stage_1_hard_gates"],
+      "description": "Validated requested loan term in months."
+    },
+    "hard_gates_passed": {
+      "type": "boolean",
+      "stages": ["stage_3_source_plan"],
+      "description": "Stage 1 aggregate hard-gate result."
+    },
+    "bureau_decision_status": {
+      "type": "string",
+      "stages": ["stage_3_source_plan"],
+      "description": "Stage 2 bureau decision status."
+    },
+    "data_sharing_consent": {
+      "type": "boolean",
+      "stages": ["stage_3_source_plan"],
+      "description": "Applicant's normalized data-sharing consent flag."
+    }
+  },
+  "source_ids": [
+    "telco_stability",
+    "utility_reliability",
+    "open_banking_cashflow",
+    "device_fingerprint",
+    "geo_mobility",
+    "ecommerce_behavior",
+    "digital_identity_age",
+    "income_velocity",
+    "microloan_history",
+    "merchant_affinity"
+  ]
+}

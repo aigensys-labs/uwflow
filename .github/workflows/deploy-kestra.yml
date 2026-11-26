@@ -1,0 +1,141 @@
+name: Deploy approved UWflow release to Kestra PROD
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Exact immutable release under var/releases/approved/
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uwflow-production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Verify and deploy approved release
+    runs-on: ubuntu-latest
+    environment: uwflow-production
+    steps:
+      - name: Check out selected source revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Validate approved release boundary
+        id: release
+        shell: bash
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF_TYPE}" != "branch" || "${GITHUB_REF_NAME}" != "main" ]]; then
+            echo "Production deployment must be dispatched from protected main." >&2
+            exit 1
+          fi
+          [[ "${RELEASE_ID}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          RELEASE_DIR="var/releases/approved/${RELEASE_ID}"
+          test -f "${RELEASE_DIR}/release-manifest.json"
+          test -f "${RELEASE_DIR}/runtime/release-manifest.json"
+          test -f "${RELEASE_DIR}/production-flow.yaml"
+          test -f "${RELEASE_DIR}/approval-reference.json"
+          test -f "${RELEASE_DIR}/candidate-manifest.json"
+          test -f "${RELEASE_DIR}/candidate-artifact-manifest.json"
+          test -f "${RELEASE_DIR}/evaluation-reference.json"
+          python - <<'PY'
+          import hashlib, json, os, pathlib, re
+          rid = os.environ["RELEASE_ID"]
+          root = pathlib.Path("var/releases/approved") / rid
+          m = json.loads((root / "release-manifest.json").read_text())
+          a = json.loads((root / "approval-reference.json").read_text())
+          assert m.get("release_id") == rid
+          assert a.get("status") == "approved"
+          assert a.get("candidate_id") == m.get("candidate_id")
+          candidate_manifest = (root / "candidate-manifest.json").read_bytes()
+          assert hashlib.sha256(candidate_manifest).hexdigest() == m.get("candidate_manifest_sha256")
+          cm = json.loads(candidate_manifest)
+          assert cm.get("candidate_id") == m.get("candidate_id")
+          assert hashlib.sha256((root / "candidate-artifact-manifest.json").read_bytes()).hexdigest() == m.get("candidate_artifact_manifest_sha256")
+          evref = json.loads((root / "evaluation-reference.json").read_text())
+          assert evref.get("evaluation_manifest_sha256") == m.get("evaluation_manifest_sha256")
+          assert a.get("candidate_manifest_sha256") == m.get("candidate_manifest_sha256")
+          assert hashlib.sha256((root / "approval-reference.json").read_bytes()).hexdigest() == m.get("approval_sha256")
+          assert hashlib.sha256((root / "evaluation-reference.json").read_bytes()).hexdigest() == m.get("evaluation_reference_sha256")
+          assert hashlib.sha256((root / "production-flow.yaml").read_bytes()).hexdigest() == m.get("production_flow_sha256")
+          image = m.get("image_reference", "")
+          assert re.fullmatch(r"[^\s@]+@sha256:[0-9a-f]{64}", image), "Image must be digest-pinned"
+          runtime = root / "runtime"
+          runtime_manifest_bytes = (runtime / "release-manifest.json").read_bytes()
+          assert hashlib.sha256(runtime_manifest_bytes).hexdigest() == m.get("runtime_manifest_sha256")
+          rm = json.loads(runtime_manifest_bytes)
+          assert rm.get("release_version") == rid
+          for name, digest in rm.get("files", {}).items():
+              assert hashlib.sha256((runtime / name).read_bytes()).hexdigest() == digest
+          print("Approved release verified:", rid)
+          PY
+          echo "dir=${RELEASE_DIR}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload immutable Core runtime to PROD Namespace Files
+        uses: kestra-io/deploy-namespace-files-action@46a87d14c9c81644cb232492ac25067228ecf473
+        with:
+          localPath: ./${{ steps.release.outputs.dir }}/runtime
+          namespacePath: runtime/releases/${{ inputs.release_id }}
+          namespace: com.ai.credit.production
+          override: false
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Validate approved production flow
+        uses: kestra-io/validate-flows-action-v2@f95154ee2d16037585c18ab88fd9fb8668cee635
+        with:
+          directory: ./${{ steps.release.outputs.dir }}
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Deploy approved production flow
+        uses: kestra-io/deploy-flows-action-v2@82d96bc143fe021017ed7219941da528c9ce3eb2
+        with:
+          directory: ./${{ steps.release.outputs.dir }}
+          override: true
+          kestractlVersion: "2.2.0"
+          server: ${{ secrets.KESTRA_HOSTNAME }}
+          user: ${{ secrets.KESTRA_USERNAME }}
+          password: ${{ secrets.KESTRA_PASSWORD }}
+
+      - name: Record deployment provenance
+        shell: bash
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p var/deployments/production/history
+          python - <<'PY'
+          import datetime, hashlib, json, os, pathlib
+          rid = os.environ["RELEASE_ID"]
+          d = pathlib.Path("var/releases/approved") / rid
+          manifest = json.loads((d / "release-manifest.json").read_text())
+          record = {"release_id": rid, "release_manifest_sha256": hashlib.sha256((d / "release-manifest.json").read_bytes()).hexdigest(),
+                    "deployed_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "github_run_id": os.environ.get("GITHUB_RUN_ID"), "github_sha": os.environ.get("GITHUB_SHA")}
+          out = pathlib.Path("var/deployments/production/history") / f"{rid}-{os.environ.get('GITHUB_RUN_ID','manual')}.json"
+          out.write_text(json.dumps(record, indent=2, sort_keys=True) + "\\n")
+          pathlib.Path("var/deployments/production/current.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\\n")
+          PY
+
+      - name: Upload deployment record
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: uwflow-production-deployment-${{ inputs.release_id }}
+          path: var/deployments/production/
+          if-no-files-found: error

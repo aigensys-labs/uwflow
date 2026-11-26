@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "stage3_consented_source_plan_v1",
+  "stage": "stage_3_source_plan",
+  "kind": "routing_dag",
+  "description": "Routes the existing Stage 1, Stage 2 and consent conditions into a source plan. It does not call adapters or execute Kestra tasks.",
+  "entry_node": "n_hard_gates",
+  "inputs": [
+    {"field": "hard_gates_passed", "type": "boolean"},
+    {"field": "bureau_decision_status", "type": "string"},
+    {"field": "data_sharing_consent", "type": "boolean"}
+  ],
+  "nodes": [
+    {"id": "n_hard_gates", "type": "condition_split", "label": "Hard gates passed?"},
+    {"id": "n_bureau", "type": "condition_split", "label": "Bureau permits continuation?"},
+    {"id": "n_consent", "type": "condition_split", "label": "Data-sharing consent given?"},
+    {
+      "id": "out_collect_sources",
+      "type": "source_plan",
+      "label": "Collect approved alternative-data sources",
+      "source_ids": [
+        "telco_stability",
+        "utility_reliability",
+        "open_banking_cashflow",
+        "device_fingerprint",
+        "geo_mobility",
+        "ecommerce_behavior",
+        "digital_identity_age",
+        "income_velocity",
+        "microloan_history",
+        "merchant_affinity"
+      ]
+    },
+    {
+      "id": "out_skip_sources",
+      "type": "outcome",
+      "label": "Skip alternative-data collection",
+      "action": "SKIP_SOURCE_COLLECTION",
+      "reason": "SOURCE_COLLECTION_NOT_PERMITTED_OR_NOT_REQUIRED"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_hard_gates_pass",
+      "source": "n_hard_gates",
+      "target": "n_bureau",
+      "condition": {"field": "hard_gates_passed", "op": "==", "value": true},
+      "priority": 10,
+      "is_default": false
+    },
+    {"id": "e_hard_gates_default", "source": "n_hard_gates", "target": "out_skip_sources", "is_default": true},
+    {
+      "id": "e_bureau_continue",
+      "source": "n_bureau",
+      "target": "n_consent",
+      "condition": {"field": "bureau_decision_status", "op": "!=", "value": "DECLINE"},
+      "priority": 10,
+      "is_default": false
+    },
+    {"id": "e_bureau_default", "source": "n_bureau", "target": "out_skip_sources", "is_default": true},
+    {
+      "id": "e_consent_given",
+      "source": "n_consent",
+      "target": "out_collect_sources",
+      "condition": {"field": "data_sharing_consent", "op": "==", "value": true},
+      "priority": 10,
+      "is_default": false
+    },
+    {"id": "e_consent_default", "source": "n_consent", "target": "out_skip_sources", "is_default": true}
+  ]
+}

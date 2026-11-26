@@ -1,0 +1,397 @@
+id: uwflow_production_underwriting
+namespace: com.ai.credit.production
+description: 'Kestra orchestrates the synthetic consumer-loan underwriting workflow. UWflow owns application validation,
+  underwriting policy, affordability, pricing and the final decision. AIDflow is a separate scoring/inference step:
+  it consumes ten normalized big-data source scores and returns one complex customer-profile score to UWflow. All
+  providers and decisions are synthetic.'
+labels:
+  app: uwflow
+  domain: underwriting
+  environment: demo
+  runtime-release: 2.0.0
+  runtime-manifest-sha256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+  system.readOnly: 'true'
+inputs:
+  - id: applicant_id
+    type: STRING
+    required: true
+    defaults: APP-2026-9482
+  - id: applicant_name
+    type: STRING
+    required: true
+    defaults: John Jones
+  - id: applicant_age
+    type: INT
+    required: true
+    defaults: 34
+  - id: monthly_income
+    type: FLOAT
+    required: true
+    defaults: 1966.61
+  - id: requested_amount
+    type: FLOAT
+    required: true
+    defaults: 8194.2
+  - id: employment_status
+    type: STRING
+    required: true
+    defaults: FULL_TIME
+  - id: existing_monthly_debt_payments
+    type: FLOAT
+    required: true
+    defaults: 266.31
+  - id: monthly_housing_cost
+    type: FLOAT
+    required: true
+    defaults: 491.65
+  - id: loan_term_months
+    type: INT
+    required: true
+    defaults: 60
+  - id: data_sharing_consent
+    type: BOOL
+    required: true
+    defaults: true
+  - id: currency
+    type: STRING
+    required: true
+    defaults: EUR
+tasks:
+  - id: stage1_hard_gates
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      APPLICATION_JSON: '{{ inputs | toJson }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from common import json_dumps
+      from hard_gates import evaluate_hard_gates
+      from provenance import load_runtime_provenance
+
+      runtime_provenance = load_runtime_provenance(
+          ctx.runtime_root,
+          expected_manifest_sha256=ctx.runtime_manifest_sha256,
+      )
+      runtime_provenance.update({
+          "task_runner": ctx.task_runner,
+          "task_runner_type": ctx.task_runner_type,
+          "python_task_image": ctx.task_image,
+          "python_version": ctx.python_version,
+      })
+      application = ctx.env_json("APPLICATION_JSON", expected_type=dict)
+      result = evaluate_hard_gates(application)
+      ctx.kestra.outputs({
+          "passed": result["passed"],
+          "status": result["status"],
+          "result_json": json_dumps(result),
+          "runtime_provenance_json": json_dumps(runtime_provenance),
+      })
+  - id: stage2_bureau_lookup
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      APPLICATION_JSON: '{{ inputs | toJson }}'
+      HARD_GATES_JSON: '{{ outputs.stage1_hard_gates.vars.result_json }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from bureau_client import get_bureau_data
+      from common import json_dumps
+
+      application = ctx.env_json("APPLICATION_JSON", expected_type=dict)
+      hard_gates = ctx.env_json("HARD_GATES_JSON", expected_type=dict)
+      result = get_bureau_data(
+          applicant_id=application["applicant_id"],
+          declared_monthly_debt_payments=application["existing_monthly_debt_payments"],
+          hard_gates=hard_gates,
+      )
+      ctx.kestra.outputs({
+          "decision_status": result["decision_status"],
+          "status": result["status"],
+          "result_json": json_dumps(result),
+      })
+  - id: stage3_source_plan
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      APPLICATION_JSON: '{{ inputs | toJson }}'
+      HARD_GATES_JSON: '{{ outputs.stage1_hard_gates.vars.result_json }}'
+      BUREAU_JSON: '{{ outputs.stage2_bureau_lookup.vars.result_json }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from policy_generated import build_stage3_source_plan
+
+      application = ctx.env_json("APPLICATION_JSON", expected_type=dict)
+      hard_gates = ctx.env_json("HARD_GATES_JSON", expected_type=dict)
+      bureau = ctx.env_json("BUREAU_JSON", expected_type=dict)
+      plan = build_stage3_source_plan({
+          "hard_gates_passed": bool(hard_gates.get("passed", False)),
+          "bureau_decision_status": str(bureau.get("decision_status", "")),
+          "data_sharing_consent": bool(application.get("data_sharing_consent", False)),
+      })
+      # This task returns a typed plan only. Kestra's existing Stage 4 Loop
+      # remains the sole executor of the source adapters.
+      ctx.kestra.outputs({
+          "source_ids": plan["source_ids"],
+          "loop_values": plan["loop_values"],
+          "planned_count": plan["planned_count"],
+          "reason": plan["reason"],
+          "trace": plan["trace"],
+      })
+  - id: stage4_bigdata_fanout
+    type: io.kestra.plugin.core.flow.Loop
+    values: '{{ outputs.stage3_source_plan.vars.loop_values }}'
+    concurrencyLimit: 10
+    fetchType: FETCH
+    outputs:
+      - id: source_result_json
+        type: STRING
+        value: '{{ outputs.query_source.vars.result_json }}'
+    tasks:
+      - id: query_source
+        type: io.kestra.plugin.scripts.python.Script
+        namespaceFiles:
+          enabled: true
+          include:
+            - runtime/releases/2.0.0/**
+          ifExists: FAIL
+        pythonVersion: '3.11'
+        containerImage: ai/uwflow-core-runtime:2.0.0
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+        env:
+          SOURCE_ID: '{{ item.value }}'
+          APPLICANT_ID: '{{ inputs.applicant_id }}'
+          APPLICATION_JSON: '{{ inputs | toJson }}'
+          APP_RUNTIME_PATH: runtime/releases/2.0.0
+          APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+          APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+          APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+        script: |-
+          from bootstrap import ctx
+          from alternative_data import get_alternative_data
+          from common import json_dumps
+
+          application = ctx.env_json("APPLICATION_JSON", expected_type=dict)
+          source_id = ctx.env_str("SOURCE_ID")
+          applicant_id = ctx.env_str("APPLICANT_ID")
+
+          if source_id == "__NO_SOURCE_COLLECTION__":
+              result = {
+                  "source_id": None,
+                  "status": "NOT_RUN",
+                  "coverage": "NONE",
+                  "reason_codes": ["SOURCE_COLLECTION_NOT_REQUIRED_OR_NOT_PERMITTED"],
+                  "applicant_id": applicant_id,
+                  "demo_mode": True,
+              }
+          else:
+              result = get_alternative_data(
+                  source_id=source_id,
+                  applicant_id=applicant_id,
+                  application=application,
+              )
+          ctx.kestra.outputs({
+              "source_id": result["source_id"],
+              "status": result["status"],
+              "result_json": json_dumps(result),
+          })
+  - id: stage5_aidflow_inference
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      SOURCE_RESULTS_JSON: '{{ loopOutputs(outputs.stage4_bigdata_fanout.outputs, ''source_result_json'') | toJson
+        }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from aidflow_scoring import score_customer_profile
+      from common import json_dumps
+
+      raw_sources = ctx.env_json("SOURCE_RESULTS_JSON", expected_type=list)
+      source_results = [ctx.json.loads(item) for item in raw_sources]
+      source_results = [item for item in source_results if item.get("status") == "SUCCESS"]
+      inference = score_customer_profile(source_results)
+      ctx.kestra.outputs({
+          "scoring_status": inference["scoring_status"],
+          "complex_customer_profile_score": inference.get("complex_customer_profile_score"),
+          "input_score_count": inference["input_score_count"],
+          "expected_input_count": inference["expected_input_count"],
+          "result_json": json_dumps(inference),
+      })
+  - id: stage6_uwflow_decision
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      APPLICATION_JSON: '{{ inputs | toJson }}'
+      HARD_GATES_JSON: '{{ outputs.stage1_hard_gates.vars.result_json }}'
+      BUREAU_JSON: '{{ outputs.stage2_bureau_lookup.vars.result_json }}'
+      AIDFLOW_RESULT_JSON: '{{ outputs.stage5_aidflow_inference.vars.result_json }}'
+      SOURCE_RESULTS_JSON: '{{ loopOutputs(outputs.stage4_bigdata_fanout.outputs, ''source_result_json'') | toJson
+        }}'
+      RUNTIME_PROVENANCE_JSON: '{{ outputs.stage1_hard_gates.vars.runtime_provenance_json }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from common import json_dumps
+      from uwflow_engine import run_uwflow_decision
+
+      application = ctx.env_json("APPLICATION_JSON", expected_type=dict)
+      hard_gates = ctx.env_json("HARD_GATES_JSON", expected_type=dict)
+      bureau = ctx.env_json("BUREAU_JSON", expected_type=dict)
+      aidflow_result = ctx.env_json("AIDFLOW_RESULT_JSON", expected_type=dict)
+      raw_sources = ctx.env_json("SOURCE_RESULTS_JSON", expected_type=list)
+      source_results = [ctx.json.loads(item) for item in raw_sources]
+      source_results = [item for item in source_results if item.get("status") == "SUCCESS"]
+      runtime_provenance = ctx.env_json("RUNTIME_PROVENANCE_JSON", expected_type=dict)
+
+      result = run_uwflow_decision(
+          application=application,
+          hard_gates=hard_gates,
+          bureau=bureau,
+          aidflow_result=aidflow_result,
+          source_results=source_results,
+          runtime_provenance=runtime_provenance,
+      )
+      ctx.kestra.outputs({
+          "decision": result["decision"],
+          "complex_customer_profile_score": result.get("complex_customer_profile_score"),
+          "risk_tier": result.get("risk_tier"),
+          "approved_amount": result.get("approved_amount", 0.0),
+          "result_json": json_dumps(result),
+      })
+  - id: stage7_render_report
+    type: io.kestra.plugin.scripts.python.Script
+    namespaceFiles:
+      enabled: true
+      include:
+        - runtime/releases/2.0.0/**
+      ifExists: FAIL
+    pythonVersion: '3.11'
+    containerImage: ai/uwflow-core-runtime:2.0.0
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    outputFiles:
+      - underwriting_decision.html
+      - underwriting_decision.pdf
+      - underwriting_decision.json
+    env:
+      RESULT_JSON: '{{ outputs.stage6_uwflow_decision.vars.result_json }}'
+      APP_RUNTIME_PATH: runtime/releases/2.0.0
+      APP_RUNTIME_MANIFEST_SHA256: ac5dca21e4c0b4f367243d6afee11f9f08fdded97ecba9b58fefda3a6f551692
+      APP_TASK_IMAGE: ai/uwflow-core-runtime:2.0.0
+      APP_RUNTIME_ARTIFACT_TYPE: uwflow-kestra-runtime
+    script: |-
+      from bootstrap import ctx
+      from report_renderer import generate_reports
+
+      decision = ctx.env_json("RESULT_JSON", expected_type=dict)
+      artifacts = generate_reports(decision, ctx.working_dir)
+      ctx.kestra.outputs({
+          "report_status": "GENERATED",
+          "decision": decision.get("decision"),
+          "decision_reference": decision.get("decision_reference"),
+          "html_report": artifacts["html"].name,
+          "pdf_report": artifacts["pdf"].name,
+          "json_report": artifacts["json"].name,
+      })
+  - id: final_decision_summary
+    type: io.kestra.plugin.core.log.Log
+    message: UWflow decision={{ outputs.stage6_uwflow_decision.vars.decision }}, customer_profile_score={{ outputs.stage6_uwflow_decision.vars.complex_customer_profile_score
+      }}, tier={{ outputs.stage6_uwflow_decision.vars.risk_tier }}, approved_amount={{ outputs.stage6_uwflow_decision.vars.approved_amount
+      }} EUR. Applicant={{ inputs.applicant_id }}. HTML and PDF UWflow underwriting reports generated in stage7_render_report.
+      DEMO ONLY - SYNTHETIC DATA.
+outputs:
+  - id: underwriting_result
+    type: JSON
+    value: '{{ fromJson(outputs.stage6_uwflow_decision.vars.result_json) }}'
+  - id: decision
+    type: STRING
+    value: '{{ outputs.stage6_uwflow_decision.vars.decision }}'
+  - id: complex_customer_profile_score
+    type: JSON
+    value: '{{ outputs.stage6_uwflow_decision.vars.complex_customer_profile_score }}'
+  - id: underwriting_html_report
+    type: FILE
+    value: '{{ outputs.stage7_render_report.outputFiles[''underwriting_decision.html''] }}'
+  - id: underwriting_pdf_report
+    type: FILE
+    value: '{{ outputs.stage7_render_report.outputFiles[''underwriting_decision.pdf''] }}'
+  - id: underwriting_json_report
+    type: FILE
+    value: '{{ outputs.stage7_render_report.outputFiles[''underwriting_decision.json''] }}'
+triggers:
+  - id: underwriting_webhook
+    type: io.kestra.plugin.core.trigger.Webhook
+    key: '{{ secret(''UNDERWRITING_WEBHOOK_KEY'') }}'
+    wait: true
+    returnOutputs: true
+    inputs:
+      applicant_id: '{{ trigger.body.applicant_id ?? ''APP-2026-9482'' }}'
+      applicant_name: '{{ trigger.body.applicant_name ?? ''John Jones'' }}'
+      applicant_age: '{{ trigger.body.applicant_age ?? 34 }}'
+      monthly_income: '{{ trigger.body.monthly_income ?? 1966.61 }}'
+      requested_amount: '{{ trigger.body.requested_amount ?? 8194.20 }}'
+      employment_status: '{{ trigger.body.employment_status ?? ''FULL_TIME'' }}'
+      existing_monthly_debt_payments: '{{ trigger.body.existing_monthly_debt_payments ?? 266.31 }}'
+      monthly_housing_cost: '{{ trigger.body.monthly_housing_cost ?? 491.65 }}'
+      loan_term_months: '{{ trigger.body.loan_term_months ?? 60 }}'
+      data_sharing_consent: '{{ trigger.body.data_sharing_consent ?? true }}'
+      currency: '{{ trigger.body.currency ?? ''EUR'' }}'
