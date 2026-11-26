@@ -35,12 +35,12 @@ classifiers = [
 dependencies = ["reportlab==5.1.0"]
 
 [project.optional-dependencies]
-studio = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "httpx2>=2.0,<3"]
+studio = ["fastapi>=0.165.0,<1", "uvicorn>=0.30,<1", "httpx2>=2.0,<3"]
 history-postgres = ["SQLAlchemy>=2.0,<3", "psycopg[binary]>=3.2,<4"]
 history-parquet = ["pyarrow>=18,<30"]
 history = ["SQLAlchemy>=2.0,<3", "psycopg[binary]>=3.2,<4", "pyarrow>=18,<30"]
 dev = [
-  "fastapi>=0.115,<1",
+  "fastapi>=0.165.0,<1",
   "httpx2>=2.0,<3",
   "pytest>=8.0",
   "PyYAML>=6.0",
